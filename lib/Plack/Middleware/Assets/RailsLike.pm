@@ -1,6 +1,6 @@
 package Plack::Middleware::Assets::RailsLike;
 
-use 5.008005;
+use 5.010_001;
 use strict;
 use warnings;
 use parent 'Plack::Middleware';
@@ -150,19 +150,52 @@ __END__
 
 =head1 NAME
 
-Plack::Middleware::Assets::RailsLike - It's new $module
+Plack::Middleware::Assets::RailsLike - Bundle and minify JavaScript and CSS files
 
 =head1 SYNOPSIS
 
-    use Plack::Middleware::Assets::RailsLike;
+    use strict;
+    use warnings;
+    use MyApp;
+    use Plack::Builder;
+    use Cache::MemoryCache;
+
+    my $app = MyApp->new->to_app;
+    
+    builder {
+        enable 'Assets::RailsLike',
+            cache  => Cache::MemoryCache->new({ namespace=>'myapp' }),
+            path   => qr{^/assets},
+            root   => './htdocs',
+            minify => 1;
+        $app;
+    };
 
 =head1 DESCRIPTION
 
-Plack::Middleware::Assets::RailsLike is ...
+B<THIS MODULE IS STILL ALPHA. DO NOT USE THIS MODULE IN PRODUCTION.>
+
+Plack::Middleware::Assets::RailsLike is a Plack middleware to bundle and minify 
+javascript and css files like Ruby on Rails Assets Pipeline.
+
+If manifest files were requested, bundle files in manifest file and serve it or
+serve bundled data from cache.
+
+Manifest file is a list of javascript and css files you want to bundle.
+
+    > cat ./htdocs/assets/main-page.js
+    requires 'jquery';
+    requires 'myapp';
+
+If I</assets/main-page.js> was requested, find I<jquery.js>, I<myapp.js> from search path (default search path is C<$root>/assets).
+
+=head1 DEPENDENCIES
+
+L<Plack>, L<Cache::Cache>, L<File::Slurp>, L<JavaScript::Minifier::XS>, L<CSS::Minifier::XS>
 
 =head1 LICENSE
 
-Copyright (C) Yoshihiro Sasaki
+Copyright (C) 2013 Yoshihiro Sasaki
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

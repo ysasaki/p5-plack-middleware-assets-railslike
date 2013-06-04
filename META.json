@@ -1,10 +1,10 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "Bundle and minify JavaScript and CSS files",
    "author" : [
-      "Yoshihiro Sasaki <ysasaki@cpan.org>"
+      "Yoshihiro Sasaki"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.4.6, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "Minilla/v0.4.6, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -42,15 +42,35 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008005"
+            "CSS::Minifier::XS" : "0.08",
+            "Cache::Cache" : "1.06",
+            "File::Slurp" : "9999.19",
+            "JavaScript::Minifier::XS" : "0.09",
+            "Plack" : "0",
+            "perl" : "5.010001"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::Name::FromLine" : "0.010"
          }
       }
    },
    "release_status" : "unstable",
-   "version" : "0.01"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ysasaki/p5-plack-middleware-assets-railslike/issues"
+      },
+      "homepage" : "https://github.com/ysasaki/p5-plack-middleware-assets-railslike",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ysasaki/p5-plack-middleware-assets-railslike.git",
+         "web" : "https://github.com/ysasaki/p5-plack-middleware-assets-railslike"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "ysasaki <aloelight@gmail.com>"
+   ]
 }

@@ -1,4 +1,4 @@
-requires 'perl',                     '5.008005';
+requires 'perl',                     '5.010001';
 requires 'Cache::Cache',             '1.06';
 requires 'CSS::Minifier::XS',        '0.08';
 requires 'File::Slurp',              '9999.19';
