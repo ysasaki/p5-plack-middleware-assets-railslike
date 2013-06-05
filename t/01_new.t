@@ -2,11 +2,18 @@ use utf8;
 use strict;
 use warnings;
 use Test::More;
+use Test::Name::FromLine;
 use Plack::Middleware::Assets::RailsLike;
 
-my $assets = new_ok 'Plack::Middleware::Assets::RailsLike',
-    [ { path => qr{/assets}, root => './t' } ];
+my $assets = new_ok 'Plack::Middleware::Assets::RailsLike';
 
-can_ok $assets, $_ for qw(path root minify);
+can_ok $assets, $_ for qw(path root search_path cache expires minify);
+
+is $assets->path,      qr{^/assets};
+is $assets->root,      '.';
+is_deeply $assets->search_path, [qw(assets)];
+can_ok $assets->cache, $_ for qw(get set);
+is $assets->expires,   '3 days';
+is $assets->minify,    0;
 
 done_testing;

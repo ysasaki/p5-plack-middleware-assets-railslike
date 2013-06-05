@@ -9,9 +9,7 @@ use Plack::Builder;
 use HTTP::Request::Common;
 
 my $app = builder {
-    enable 'Assets::RailsLike',
-        path => qr{/assets},
-        root => './t';
+    enable 'Assets::RailsLike', root => './t';
     sub { [ 200, [ 'Content-Type', 'text/html' ], ['OK'] ] };
 };
 

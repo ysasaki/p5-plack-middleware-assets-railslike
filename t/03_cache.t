@@ -13,7 +13,6 @@ my $cache = Cache::MemoryCache->new( { namespace => 'foo' } );
 my $app = builder {
     enable 'Assets::RailsLike',
         cache => $cache,
-        path  => qr{/assets},
         root  => './t';
     sub { [ 200, [ 'Content-Type', 'text/html' ], ['OK'] ] };
 };

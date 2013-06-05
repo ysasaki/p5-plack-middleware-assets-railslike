@@ -8,17 +8,12 @@ Plack::Middleware::Assets::RailsLike - Bundle and minify JavaScript and CSS file
     use warnings;
     use MyApp;
     use Plack::Builder;
-    use Cache::MemoryCache;
 
     my $app = MyApp->new->to_app;
     
 
     builder {
-        enable 'Assets::RailsLike',
-            cache  => Cache::MemoryCache->new({ namespace=>'myapp' }),
-            path   => qr{^/assets},
-            root   => './htdocs',
-            minify => 1;
+        enable 'Assets::RailsLike', root => './htdocs', minify => 1;
         $app;
     };
 
@@ -39,6 +34,49 @@ Manifest file is a list of javascript and css files you want to bundle.
     requires 'myapp';
 
 If _/assets/main-page.js_ was requested, find _jquery.js_, _myapp.js_ from search path (default search path is `$root`/assets).
+
+# CONFIGURATIONS
+
+- root
+
+    Document root to find manifest files to serve.
+
+    Default value is current directory('.').
+
+- path
+
+    The URL pattern (regular expression) for matching.
+
+    Default value is `qr{^/assets}`.
+
+- search\_path
+
+    Paths to find javascript and css files.
+
+    Default value is `[qw($root/assets)]`.
+
+- minify
+
+    Minify javascript and css files if true.
+
+    Default value is `0`.
+
+- cache
+
+    Cache bundled/minified data in memory. The `cache` object must be implemented `get` and `set` methods.
+
+    Default is a `Cache::MemoryCache` Object.
+
+        Cache::MemoryCache->new({
+            namespace          => "Plack::Middleware::Assets::RailsLike",
+            default_expires_in => $expires
+        })
+
+- expires
+
+    Expiration of cache.
+
+    Default is 3 days.
 
 # DEPENDENCIES
 

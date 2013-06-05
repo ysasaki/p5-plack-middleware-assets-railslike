@@ -10,7 +10,6 @@ use HTTP::Request::Common;
 
 my $app = builder {
     enable 'Assets::RailsLike',
-        path   => qr{/assets},
         root   => './t',
         minify => 1;
     sub { [ 200, [ 'Content-Type', 'text/html' ], ['OK'] ] };

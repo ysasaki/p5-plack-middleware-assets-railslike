@@ -1,0 +1,2 @@
+requires 'foo';
+requires 'baz';

@@ -2,6 +2,9 @@ Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
 
+    - Adds default configuration values.
+    - Adds search_path option.
+
 0.01 2013-06-04T14:46:04Z
 
     - original version

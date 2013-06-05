@@ -4,15 +4,36 @@ use 5.010_001;
 use strict;
 use warnings;
 use parent 'Plack::Middleware';
-use Plack::Util::Accessor qw(path root cache minify);
+use Plack::Util::Accessor qw(path root search_path cache expires minify);
 use Cache::MemoryCache;
+use Carp ();
 use CSS::Minifier::XS ();
+use Errno ();
 use File::Basename;
 use File::Slurp;
-use File::Spec::Functions qw(catfile canonpath);
+use File::Spec::Functions qw(catdir catfile canonpath);
 use JavaScript::Minifier::XS ();
 
 our $VERSION = "0.01";
+
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
+
+    # Set default values for options
+    $self->{path}        ||= qr{^/assets};
+    $self->{root}        ||= '.';
+    $self->{search_path} ||= [catdir($self->{root},'assets')],
+    $self->{minify}      ||= 0;
+    $self->{expires}     ||= '3 days';
+    $self->{cache}       ||= Cache::MemoryCache->new(
+        {   namespace          => __PACKAGE__,
+            default_expires_in => $self->{expires},
+        }
+    );
+
+    return $self;
+}
 
 sub call {
     my ( $self, $env ) = @_;
@@ -33,9 +54,6 @@ sub _build_content {
 
     my ( $filename, $dirs, $suffix ) = fileparse( $real_path, qr/\.[^.]*/ );
     my $type = $suffix eq '.js' ? 'js' : 'css';
-
-    $self->{cache}
-        ||= Cache::MemoryCache->new( { namespace => __PACKAGE__ } );
 
     my $content = $self->cache->get($real_path) || do {
         my $manifest = read_file($real_path);
@@ -85,7 +103,10 @@ EOM
     }
     if ($error) { die "Parsing $real_path failed: $error" }
 
-    return $asset->to_string( path => $real_path, type => $type );
+    return $asset->to_string(
+        type        => $type,
+        search_path => $self->search_path
+    );
 }
 
 package Plack::Middleware::Assets::RailsLike::Asset;
@@ -118,21 +139,41 @@ sub new {
 sub to_string {
     my $self = shift;
     my %args = (
-        path => undef,
-        type => 'js',
+        search_path => ['.'],
+        type        => 'js',
         @_
     );
 
     my $type = $args{type};
-    my @path = ( fileparse( $args{path} ) )[1];
 
     my $content = '';
     for my $file ( @{ $self->{requires} } ) {
-        my $real_path = canonpath(
-            catfile( @path,, sprintf( '%s.%s', $file, $type ) ) );
+        my $asset_exists = 0;
+        for my $path ( @{ $args{search_path} } ) {
 
-        # '' => Suppress "Use of uninitialized value"
-        $content .= read_file( $real_path, err_mode => 'carp' ) || '';
+            my $filename = canonpath(
+                catfile( $path, sprintf( '%s.%s', $file, $type ) ) );
+
+            my $buff;
+            read_file( $filename, buf_ref => \$buff, err_mode => sub { } );
+            unless ($!) {
+                $asset_exists = 1;
+                $content .= $buff;
+                last;
+            }
+            elsif ( $!{ENOENT} ) {
+                next;
+            }
+            else {
+                $asset_exists = 1;
+                Carp::carp("read_file '$filename' failed - $!");
+                last;
+            }
+        }
+        unless ($asset_exists) {
+            Carp::carp( sprintf "requires '%s' failed - No such file in %s",
+                $file, join( ', ', @{ $args{search_path} } ) );
+        }
     }
     return $content;
 }
@@ -158,16 +199,11 @@ Plack::Middleware::Assets::RailsLike - Bundle and minify JavaScript and CSS file
     use warnings;
     use MyApp;
     use Plack::Builder;
-    use Cache::MemoryCache;
 
     my $app = MyApp->new->to_app;
     
     builder {
-        enable 'Assets::RailsLike',
-            cache  => Cache::MemoryCache->new({ namespace=>'myapp' }),
-            path   => qr{^/assets},
-            root   => './htdocs',
-            minify => 1;
+        enable 'Assets::RailsLike', root => './htdocs', minify => 1;
         $app;
     };
 
@@ -188,6 +224,53 @@ Manifest file is a list of javascript and css files you want to bundle.
     requires 'myapp';
 
 If I</assets/main-page.js> was requested, find I<jquery.js>, I<myapp.js> from search path (default search path is C<$root>/assets).
+
+=head1 CONFIGURATIONS
+
+=over 4
+
+=item root
+
+Document root to find manifest files to serve.
+
+Default value is current directory('.').
+
+=item path
+
+The URL pattern (regular expression) for matching.
+
+Default value is C<qr{^/assets}>.
+
+=item search_path
+
+Paths to find javascript and css files.
+
+Default value is C<[qw($root/assets)]>.
+
+=item minify
+
+Minify javascript and css files if true.
+
+Default value is C<0>.
+
+=item cache
+
+Cache bundled/minified data in memory. The C<cache> object must be implemented C<get> and C<set> methods.
+
+Default is a C<Cache::MemoryCache> Object.
+
+    Cache::MemoryCache->new({
+        namespace          => "Plack::Middleware::Assets::RailsLike",
+        default_expires_in => $expires
+    })
+
+=item expires
+
+Expiration of cache.
+
+Default is 3 days.
+
+=back
 
 =head1 DEPENDENCIES
 
