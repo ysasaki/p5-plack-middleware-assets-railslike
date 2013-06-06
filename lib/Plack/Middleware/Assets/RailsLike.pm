@@ -31,9 +31,8 @@ my %_expiration_units = (
     map( ( $_, 60 * 60 * 24 * 365 ), qw(y year years) )
 );
 
-sub new {
-    my $class = shift;
-    my $self  = $class->SUPER::new(@_);
+sub prepare_app {
+    my $self = shift;
 
     # Set default values for options
     $self->{path}        ||= qr{^/assets};
@@ -46,8 +45,6 @@ sub new {
             default_expires_in => $self->{expires},
         }
     );
-
-    return $self;
 }
 
 sub call {

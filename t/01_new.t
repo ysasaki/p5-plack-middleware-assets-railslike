@@ -6,8 +6,9 @@ use Test::Name::FromLine;
 use Plack::Middleware::Assets::RailsLike;
 
 my $assets = new_ok 'Plack::Middleware::Assets::RailsLike';
-
 can_ok $assets, $_ for qw(path root search_path cache expires minify);
+
+$assets->prepare_app;
 
 is $assets->path,      qr{^/assets};
 is $assets->root,      '.';
