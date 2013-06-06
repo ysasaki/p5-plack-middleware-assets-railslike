@@ -12,8 +12,9 @@ use Cache::MemoryCache;
 my $cache = Cache::MemoryCache->new( { namespace => 'foo' } );
 my $app = builder {
     enable 'Assets::RailsLike',
-        cache => $cache,
-        root  => './t';
+        cache  => $cache,
+        root   => './t',
+        minify => 0;
     sub { [ 200, [ 'Content-Type', 'text/html' ], ['OK'] ] };
 };
 

@@ -14,7 +14,7 @@ use HTTP::Request::Common;
 my $now = time();
 
 my $app = builder {
-    enable 'Assets::RailsLike', root => './t', expires => '3day';
+    enable 'Assets::RailsLike', root => './t', expires => '3day', minify => 0;
     sub { [ 200, [ 'Content-Type', 'text/html' ], ['OK'] ] };
 };
 

@@ -14,6 +14,6 @@ is $assets->root,      '.';
 is_deeply $assets->search_path, [qw(assets)];
 can_ok $assets->cache, $_ for qw(get set);
 is $assets->expires,   '3 days';
-is $assets->minify,    0;
+is $assets->minify,    1;
 
 done_testing;

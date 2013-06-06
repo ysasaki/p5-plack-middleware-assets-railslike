@@ -6,16 +6,16 @@ use warnings;
 use parent 'Plack::Middleware';
 use Plack::Util::Accessor qw(path root search_path cache expires minify);
 use Cache::MemoryCache;
-use Carp ();
+use Carp              ();
 use CSS::Minifier::XS ();
-use Errno ();
+use Errno             ();
 use File::Basename;
 use File::Slurp;
 use File::Spec::Functions qw(catdir catfile canonpath);
-use HTTP::Date ();
+use HTTP::Date               ();
 use JavaScript::Minifier::XS ();
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 our $EXPIRES_NEVER = $Cache::Cache::EXPIRES_NEVER;
 our $EXPIRES_NOW   = $Cache::Cache::EXPIRES_NOW;
@@ -38,8 +38,8 @@ sub new {
     # Set default values for options
     $self->{path}        ||= qr{^/assets};
     $self->{root}        ||= '.';
-    $self->{search_path} ||= [catdir($self->{root},'assets')],
-    $self->{minify}      ||= 0;
+    $self->{search_path} ||= [catdir($self->{root},'assets')];
+    $self->{minify}      //= 1;
     $self->{expires}     ||= '3 days';
     $self->{cache}       ||= Cache::MemoryCache->new(
         {   namespace          => __PACKAGE__,
@@ -254,7 +254,7 @@ Plack::Middleware::Assets::RailsLike - Bundle and minify JavaScript and CSS file
     my $app = MyApp->new->to_app;
     
     builder {
-        enable 'Assets::RailsLike', root => './htdocs', minify => 1;
+        enable 'Assets::RailsLike', root => './htdocs';
         $app;
     };
 
@@ -302,7 +302,7 @@ Default value is C<[qw($root/assets)]>.
 
 Minify javascript and css files if true.
 
-Default value is C<0>.
+Default value is C<1>.
 
 =item cache
 

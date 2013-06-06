@@ -10,7 +10,8 @@ use HTTP::Request::Common;
 my $app = builder {
     enable 'Assets::RailsLike',
         root        => './t',
-        search_path => [qw(t/ya-assets t/assets)];
+        search_path => [qw(t/ya-assets t/assets)],
+        minify      => 0;
     sub { [ 200, [ 'Content-Type', 'text/html' ], ['OK'] ] };
 };
 

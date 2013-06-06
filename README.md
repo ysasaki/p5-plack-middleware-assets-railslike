@@ -13,7 +13,7 @@ Plack::Middleware::Assets::RailsLike - Bundle and minify JavaScript and CSS file
     
 
     builder {
-        enable 'Assets::RailsLike', root => './htdocs', minify => 1;
+        enable 'Assets::RailsLike', root => './htdocs';
         $app;
     };
 
@@ -59,7 +59,7 @@ If _/assets/main-page.js_ was requested, find _jquery.js_, _myapp.js_ from searc
 
     Minify javascript and css files if true.
 
-    Default value is `0`.
+    Default value is `1`.
 
 - cache
 
