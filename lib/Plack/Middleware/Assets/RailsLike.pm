@@ -12,9 +12,24 @@ use Errno ();
 use File::Basename;
 use File::Slurp;
 use File::Spec::Functions qw(catdir catfile canonpath);
+use HTTP::Date ();
 use JavaScript::Minifier::XS ();
 
 our $VERSION = "0.01";
+
+our $EXPIRES_NEVER = $Cache::Cache::EXPIRES_NEVER;
+our $EXPIRES_NOW   = $Cache::Cache::EXPIRES_NOW;
+
+# copy from Cache::BaseCache
+my %_expiration_units = (
+    map( ( $_, 1 ),                  qw(s second seconds sec) ),
+    map( ( $_, 60 ),                 qw(m minute minutes min) ),
+    map( ( $_, 60 * 60 ),            qw(h hour hours) ),
+    map( ( $_, 60 * 60 * 24 ),       qw(d day days) ),
+    map( ( $_, 60 * 60 * 24 * 7 ),   qw(w week weeks) ),
+    map( ( $_, 60 * 60 * 24 * 30 ),  qw(M month months) ),
+    map( ( $_, 60 * 60 * 24 * 365 ), qw(y year years) )
+);
 
 sub new {
     my $class = shift;
@@ -70,10 +85,29 @@ sub _build_content {
         $content;
     };
 
+    # build headers
     my $content_type = $type eq 'js' ? 'application/javascript' : 'text/css';
+
+    my $expires;
+    if ( $self->expires ne $EXPIRES_NEVER and $self->expires ne $EXPIRES_NOW )
+    {
+        $expires = time + $self->_expires_in_seconds;
+    }
+    elsif ( $self->expires eq $EXPIRES_NEVER ) {
+
+        # See http://www.w3.org/Protocols/rfc2616/rfc2616.txt 14.21 Expires
+        $expires = time + $_expiration_units{'year'};
+    }
+    else {
+        $expires = time;
+    }
+
     return [
         200,
-        [ 'Content-Type', $content_type, 'Content-Length', length($content) ],
+        [   'Content-Type'   => $content_type,
+            'Content-Length' => length($content),
+            'Expires'        => HTTP::Date::time2str($expires)
+        ],
         [$content]
     ];
 }
@@ -107,6 +141,23 @@ EOM
         type        => $type,
         search_path => $self->search_path
     );
+}
+
+sub _expires_in_seconds {
+    my $self    = shift;
+    my $expires = $self->expires;
+
+    my ( $n, $unit ) = $expires =~ /^\s*(\d+)\s*(\w+)\s*$/;
+    if ( $n && $unit && ( my $secs = $_expiration_units{$unit} ) ) {
+        return $n * $secs;
+    }
+    elsif ( $expires =~ /^\s*(\d+)\s*$/ ) {
+        return $expires;
+    }
+    else {
+        Carp::carp "Invalid expiration time '$expires'";
+        return 0;
+    }
 }
 
 package Plack::Middleware::Assets::RailsLike::Asset;
@@ -266,7 +317,7 @@ Default is a C<Cache::MemoryCache> Object.
 
 =item expires
 
-Expiration of cache.
+Expiration of cache and Expires header in HTTP response. See L<Cache::Cache> for more details.
 
 Default is 3 days.
 

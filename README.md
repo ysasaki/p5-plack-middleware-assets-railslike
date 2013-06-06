@@ -74,7 +74,7 @@ If _/assets/main-page.js_ was requested, find _jquery.js_, _myapp.js_ from searc
 
 - expires
 
-    Expiration of cache.
+    Expiration of cache and Expires header in HTTP response. See [Cache::Cache](http://search.cpan.org/perldoc?Cache::Cache) for more details.
 
     Default is 3 days.
 

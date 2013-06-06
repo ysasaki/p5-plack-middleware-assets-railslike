@@ -4,6 +4,7 @@ Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
     - Adds default configuration values.
     - Adds search_path option.
+    - Adds Expires header to the HTTP response.
 
 0.01 2013-06-04T14:46:04Z
 

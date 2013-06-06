@@ -45,6 +45,7 @@
             "CSS::Minifier::XS" : "0.08",
             "Cache::Cache" : "1.06",
             "File::Slurp" : "9999.19",
+            "HTTP::Date" : "6.02",
             "JavaScript::Minifier::XS" : "0.09",
             "Plack" : "0",
             "perl" : "5.010001"
@@ -53,7 +54,8 @@
       "test" : {
          "requires" : {
             "Test::More" : "0.98",
-            "Test::Name::FromLine" : "0.010"
+            "Test::Name::FromLine" : "0.010",
+            "Test::Time" : "0.04"
          }
       }
    },
