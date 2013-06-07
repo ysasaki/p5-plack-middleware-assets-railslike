@@ -421,7 +421,7 @@ Default is 3 days.
 
 =head1 DEPENDENCIES
 
-L<Plack>, L<Cache::Cache>, L<File::Slurp>, L<JavaScript::Minifier::XS>, L<CSS::Minifier::XS>
+L<Plack>, L<Cache::Cache>, L<File::Slurp>, L<JavaScript::Minifier::XS>, L<CSS::Minifier::XS>, L<Digest::SHA1>, L<HTTP::Date>
 
 =head1 LICENSE
 

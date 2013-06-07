@@ -85,7 +85,7 @@ If manifest files were requested, bundle files in manifest file and serve it or 
 
 # DEPENDENCIES
 
-[Plack](http://search.cpan.org/perldoc?Plack), [Cache::Cache](http://search.cpan.org/perldoc?Cache::Cache), [File::Slurp](http://search.cpan.org/perldoc?File::Slurp), [JavaScript::Minifier::XS](http://search.cpan.org/perldoc?JavaScript::Minifier::XS), [CSS::Minifier::XS](http://search.cpan.org/perldoc?CSS::Minifier::XS)
+[Plack](http://search.cpan.org/perldoc?Plack), [Cache::Cache](http://search.cpan.org/perldoc?Cache::Cache), [File::Slurp](http://search.cpan.org/perldoc?File::Slurp), [JavaScript::Minifier::XS](http://search.cpan.org/perldoc?JavaScript::Minifier::XS), [CSS::Minifier::XS](http://search.cpan.org/perldoc?CSS::Minifier::XS), [Digest::SHA1](http://search.cpan.org/perldoc?Digest::SHA1), [HTTP::Date](http://search.cpan.org/perldoc?HTTP::Date)
 
 # LICENSE
 
