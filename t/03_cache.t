@@ -34,6 +34,12 @@ test_psgi(
             is $res->code,    200;
             is $res->content, compiled_css;
         };
+
+        subtest 'with versioning' => sub {
+            my $res = $cb->( GET '/assets/application-123456789.js' );
+            is $res->code,    200;
+            is $res->content, compiled_js;
+        };
     }
 );
 
@@ -47,5 +53,7 @@ sub cache_ok {
 
 cache_ok( 'js cache',  't/assets/application.js',  compiled_js );
 cache_ok( 'css cache', 't/assets/application.css', compiled_css );
+cache_ok( 'with versioning cache',
+    't/assets/application-123456789.js', compiled_js );
 
 done_testing;

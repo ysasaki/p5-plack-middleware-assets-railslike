@@ -13,7 +13,7 @@ my $html = <<HTML;
 <head>
     <meta charset="UTF-8">
     <title>Assets::RailsLike</title>
-    <script src="/assets/main.js" type="text/javascript"></script>
+    <script src="/assets/main-v0001.js" type="text/javascript"></script>
 </head>
 <body><h1>Assets::RailsLike</h1></body>
 </html>
@@ -21,8 +21,7 @@ HTML
 
 builder {
     enable 'Assets::RailsLike',
-        path   => qr{^/assets},
-        root   => '.',
-        minify => 1;
+        root        => './htdocs',
+        search_path => ['./htdocs/js'];
     sub { [ 200, [ 'Content-Type', 'text/html; charset=utf-8' ], [$html] ] };
 };

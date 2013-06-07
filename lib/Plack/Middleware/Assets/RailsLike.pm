@@ -53,7 +53,24 @@ sub call {
     my $path_info = $env->{PATH_INFO};
     if ( $path_info =~ $self->path ) {
         my $real_path = canonpath( catfile( $self->root, $path_info ) );
-        return $self->_build_content($real_path);
+        my ( $filename, $dirs, $suffix ) = fileparse( $real_path, qr/\.[^.]*/ );
+        my $type = $suffix eq '.js' ? 'js' : 'css';
+
+        my $content;
+        {
+            local $@;
+            eval {
+                $content = $self->_build_content( 
+                    $real_path, $filename, $dirs, $suffix, $type
+                );
+            };
+            if ($@) {
+                warn $@;
+                return $self->_500;
+            }
+        }
+        return $self->_404 unless $content;
+        return $self->_build_response($content, $type);
     }
     else {
         return $self->app->($env);
@@ -62,43 +79,56 @@ sub call {
 
 sub _build_content {
     my $self = shift;
-    my ($real_path) = @_;
-
-    my ( $filename, $dirs, $suffix ) = fileparse( $real_path, qr/\.[^.]*/ );
-    my $type = $suffix eq '.js' ? 'js' : 'css';
+    my ($real_path, $filename, $dirs, $suffix, $type) = @_;
+    my ($base, $version) = $filename =~ /^(.+)-([^\-]+)$/;
 
     my $content = $self->cache->get($real_path);
-    unless ($content) {
-        my $manifest = read_file($real_path);
-        $content = $self->_parse_manifest( $real_path, $manifest, $type );
+    return $content if $content;
 
-        if ( $self->minify ) {
-            if ( $type eq 'js' ) {
-                $content = JavaScript::Minifier::XS::minify($content);
-            }
-            else {
-                $content = CSS::Minifier::XS::minify($content);
-            }
+    my (@list, $pre_compiled);
+    if ($version) {
+        @list = ( $real_path, catfile( $dirs, "$base$suffix" ) );
+        $pre_compiled = 1;
+    }
+    else {
+        @list = ($real_path);
+        $pre_compiled = 0;
+    }
+
+    for my $file (@list) {
+        my $manifest;
+        read_file($file, buf_ref => \$manifest, err_mode => sub {});
+        if ($! and $!{ENOENT}) {
+            $pre_compiled = 0;
+            next;
+        }
+        elsif ($!) {
+            die "read_file '$file' failed - $!";
         }
 
+        if ( $pre_compiled ) {
+            $content = $manifest;
+        }
+        else {
+            $content = $self->_parse_manifest( $file, $manifest, $type );
+            $content = $self->_minify($type, $content) if $self->minify;
+        }
+
+        # filename with versioning as a key
         $self->cache->set( $real_path, $content );
+        last;
     }
+    return $content;
+}
+
+sub _build_response {
+    my $self = shift;
+    my ($content, $type) = @_;
 
     # build headers
     my $content_type = $type eq 'js' ? 'application/javascript' : 'text/css';
-
-    my $max_age = 0;
-    if ( $self->expires ne $EXPIRES_NEVER and $self->expires ne $EXPIRES_NOW )
-    {
-        $max_age = $self->_expires_in_seconds;
-    }
-    elsif ( $self->expires eq $EXPIRES_NEVER ) {
-
-        # See http://www.w3.org/Protocols/rfc2616/rfc2616.txt 14.21 Expires
-        $max_age = $_expiration_units{'year'};
-    }
-
-    my $expires = time + $max_age;
+    my $max_age      = $self->_max_age;
+    my $expires      = time + $max_age;
 
     return [
         200,
@@ -134,12 +164,39 @@ $manifest;
 EOM
         $error = $@;
     }
-    if ($error) { die "Parsing $real_path failed: $error" }
+    if ($error) { Carp::croak "Parsing $real_path failed: $error" }
 
     return $asset->to_string(
         type        => $type,
         search_path => $self->search_path
     );
+}
+
+sub _minify {
+    my $self = shift;
+    my ($type, $content) = @_;
+    if ( $type eq 'js' ) {
+        $content = JavaScript::Minifier::XS::minify($content);
+    }
+    else {
+        $content = CSS::Minifier::XS::minify($content);
+    }
+    return $content;
+}
+
+sub _max_age {
+    my $self    = shift;
+    my $max_age = 0;
+    if ( $self->expires ne $EXPIRES_NEVER and $self->expires ne $EXPIRES_NOW )
+    {
+        $max_age = $self->_expires_in_seconds;
+    }
+    elsif ( $self->expires eq $EXPIRES_NEVER ) {
+
+        # See http://www.w3.org/Protocols/rfc2616/rfc2616.txt 14.21 Expires
+        $max_age = $_expiration_units{'year'};
+    }
+    return $max_age;
 }
 
 sub _expires_in_seconds {
@@ -157,6 +214,28 @@ sub _expires_in_seconds {
         Carp::carp "Invalid expiration time '$expires'";
         return 0;
     }
+}
+
+sub _404 {
+    my $self    = shift;
+    $self->_error_page(404, 'Not Found');
+}
+
+sub _500 {
+    my $self    = shift;
+    $self->_error_page(500, 'Internal Server Error');
+}
+
+sub _error_page {
+    my $self = shift;
+    my ($code, $content) = @_;
+    return [
+        $code,
+        [   'Content-Type'   => 'text/plain',
+            'Content-Length' => length($content)
+        ],
+        [$content]
+    ];
 }
 
 package Plack::Middleware::Assets::RailsLike::Asset;
@@ -264,16 +343,20 @@ B<THIS MODULE IS STILL ALPHA. DO NOT USE THIS MODULE IN PRODUCTION.>
 Plack::Middleware::Assets::RailsLike is a Plack middleware to bundle and minify 
 javascript and css files like Ruby on Rails Assets Pipeline.
 
-If manifest files were requested, bundle files in manifest file and serve it or
-serve bundled data from cache.
+At first, you create a manifest file. The Manifest file is a list of javascript and css files you want to bundle.
 
-Manifest file is a list of javascript and css files you want to bundle.
-
+    > vim ./htdocs/assets/main-page.js
     > cat ./htdocs/assets/main-page.js
     requires 'jquery';
     requires 'myapp';
 
-If I</assets/main-page.js> was requested, find I<jquery.js>, I<myapp.js> from search path (default search path is C<$root>/assets).
+
+Next, write a manifest file's url in your html. This middleware supports versioning. So you can add version string like this.
+
+    <- $basename-$version$suffix ->
+    <script type="text/javascript" src="/assets/main-page-v2013060701.js">
+
+If manifest files were requested, bundle files in manifest file and serve it or serve bundled data from cache. In this case, find I<jquery.js>, I<myapp.js> from search path (default search path is C<$root>/assets).
 
 =head1 CONFIGURATIONS
 
