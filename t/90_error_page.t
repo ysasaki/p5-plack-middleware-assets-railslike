@@ -4,7 +4,6 @@ use warnings;
 use t::Util qw(minified_js);
 use Test::More;
 use Test::Name::FromLine;
-use Test::Time;
 use Plack::Test;
 use Plack::Builder;
 use HTTP::Date;
@@ -26,6 +25,7 @@ test_psgi(
             is $res->content, 'Not Found';
         };
 
+        local $SIG{__WARN__} = sub {};
         chmod 0000, './t/assets/not-read.js';
         subtest '500 - Internal Server Error' => sub {
             my $res = $cb->( GET '/assets/not-read.js' );
