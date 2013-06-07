@@ -67,9 +67,11 @@ sub _build_content {
     my ( $filename, $dirs, $suffix ) = fileparse( $real_path, qr/\.[^.]*/ );
     my $type = $suffix eq '.js' ? 'js' : 'css';
 
-    my $content = $self->cache->get($real_path) || do {
+    my $content = $self->cache->get($real_path);
+    unless ($content) {
         my $manifest = read_file($real_path);
-        my $content = $self->_parse_manifest( $real_path, $manifest, $type );
+        $content = $self->_parse_manifest( $real_path, $manifest, $type );
+
         if ( $self->minify ) {
             my $minifier
                 = $type eq 'js'
@@ -78,31 +80,31 @@ sub _build_content {
             no strict 'refs';
             $content = $minifier->($content);
         }
+
         $self->cache->set( $real_path, $content );
-        $content;
-    };
+    }
 
     # build headers
     my $content_type = $type eq 'js' ? 'application/javascript' : 'text/css';
 
-    my $expires;
+    my $max_age = 0;
     if ( $self->expires ne $EXPIRES_NEVER and $self->expires ne $EXPIRES_NOW )
     {
-        $expires = time + $self->_expires_in_seconds;
+        $max_age = $self->_expires_in_seconds;
     }
     elsif ( $self->expires eq $EXPIRES_NEVER ) {
 
         # See http://www.w3.org/Protocols/rfc2616/rfc2616.txt 14.21 Expires
-        $expires = time + $_expiration_units{'year'};
+        $max_age = $_expiration_units{'year'};
     }
-    else {
-        $expires = time;
-    }
+
+    my $expires = time + $max_age;
 
     return [
         200,
         [   'Content-Type'   => $content_type,
             'Content-Length' => length($content),
+            'Cache-Control'  => sprintf('max-age=%d', $max_age),
             'Expires'        => HTTP::Date::time2str($expires)
         ],
         [$content]

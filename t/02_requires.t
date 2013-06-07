@@ -12,6 +12,7 @@ use HTTP::Request::Common;
 
 # Freeze
 my $now = time();
+my $expires_in_secs = 3 * 24 * 60 * 60;
 
 my $app = builder {
     enable 'Assets::RailsLike', root => './t', expires => '3day', minify => 0;
@@ -34,7 +35,8 @@ test_psgi(
             is $res->code,    200;
             is $res->content, compiled_js;
             is $res->header('Content-Type'), 'application/javascript';
-            is $res->header('Expires'), time2str( $now + 3 * 24 * 60 * 60 );
+            is $res->header('Cache-Control'), "max-age=$expires_in_secs";
+            is $res->header('Expires'), time2str( $now + $expires_in_secs );
         };
 
         subtest 'css' => sub {
