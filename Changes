@@ -5,6 +5,7 @@ Revision history for Perl extension Plack-Middleware-Assets-RailsLike
     - Adds Cache-Control header to the HTTP response.
     - Removes no strict 'refs'.
     - Adds version string support.
+    - Adds Etag support.
 
 0.02 2013-06-06T08:50:56Z
 

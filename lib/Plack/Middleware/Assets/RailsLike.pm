@@ -8,6 +8,7 @@ use Plack::Util::Accessor qw(path root search_path cache expires minify);
 use Cache::MemoryCache;
 use Carp              ();
 use CSS::Minifier::XS ();
+use Digest::SHA1      ();
 use Errno             ();
 use File::Basename;
 use File::Slurp;
@@ -70,7 +71,14 @@ sub call {
             }
         }
         return $self->_404 unless $content;
-        return $self->_build_response($content, $type);
+
+        my $etag = Digest::SHA1::sha1_hex($content);
+        if ( $env->{'HTTP_IF_NONE_MATCH'} ||'' eq $etag ) {
+            return $self->_304;
+        }
+        else {
+            return $self->_build_response($content, $type, $etag);
+        }
     }
     else {
         return $self->app->($env);
@@ -123,7 +131,7 @@ sub _build_content {
 
 sub _build_response {
     my $self = shift;
-    my ($content, $type) = @_;
+    my ($content, $type, $etag) = @_;
 
     # build headers
     my $content_type = $type eq 'js' ? 'application/javascript' : 'text/css';
@@ -135,7 +143,8 @@ sub _build_response {
         [   'Content-Type'   => $content_type,
             'Content-Length' => length($content),
             'Cache-Control'  => sprintf('max-age=%d', $max_age),
-            'Expires'        => HTTP::Date::time2str($expires)
+            'Expires'        => HTTP::Date::time2str($expires),
+            'Etag'           => $etag,
         ],
         [$content]
     ];
@@ -216,17 +225,22 @@ sub _expires_in_seconds {
     }
 }
 
+sub _304 {
+    my $self    = shift;
+    $self->_response(304, 'Not Modified');
+}
+
 sub _404 {
     my $self    = shift;
-    $self->_error_page(404, 'Not Found');
+    $self->_response(404, 'Not Found');
 }
 
 sub _500 {
     my $self    = shift;
-    $self->_error_page(500, 'Internal Server Error');
+    $self->_response(500, 'Internal Server Error');
 }
 
-sub _error_page {
+sub _response {
     my $self = shift;
     my ($code, $content) = @_;
     return [

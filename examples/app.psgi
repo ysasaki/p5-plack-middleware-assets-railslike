@@ -16,6 +16,8 @@ my $html = <<HTML;
     <script src="/assets/main-v0001.js" type="text/javascript"></script>
 </head>
 <body><h1>Assets::RailsLike</h1></body>
+<a href="/">TOPへ</a>
+<a href="/another-page">別ページへ</a>
 </html>
 HTML
 

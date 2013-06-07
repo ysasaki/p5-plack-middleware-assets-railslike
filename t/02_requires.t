@@ -5,6 +5,7 @@ use t::Util qw(compiled_js compiled_css);
 use Test::More;
 use Test::Name::FromLine;
 use Test::Time;
+use Digest::SHA1 qw(sha1_hex);
 use Plack::Test;
 use Plack::Builder;
 use HTTP::Date;
@@ -30,6 +31,7 @@ test_psgi(
             is $res->content, 'OK';
         };
 
+        my $etag = sha1_hex(compiled_js);
         subtest 'javascript' => sub {
             my $res = $cb->( GET '/assets/application.js' );
             is $res->code,    200;
@@ -37,6 +39,13 @@ test_psgi(
             is $res->header('Content-Type'), 'application/javascript';
             is $res->header('Cache-Control'), "max-age=$expires_in_secs";
             is $res->header('Expires'), time2str( $now + $expires_in_secs );
+            is $res->header('Etag'), $etag;
+        };
+
+        subtest 'with etag' => sub {
+            my $res = $cb->( GET '/assets/application.js', 'If-None-Match', $etag );
+            is $res->code,    304;
+            is $res->content, 'Not Modified';
         };
 
         subtest 'css' => sub {

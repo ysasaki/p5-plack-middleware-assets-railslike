@@ -44,6 +44,7 @@
          "requires" : {
             "CSS::Minifier::XS" : "0.08",
             "Cache::Cache" : "1.06",
+            "Digest::SHA1" : "2.13",
             "File::Slurp" : "9999.19",
             "HTTP::Date" : "6.02",
             "JavaScript::Minifier::XS" : "0.09",
