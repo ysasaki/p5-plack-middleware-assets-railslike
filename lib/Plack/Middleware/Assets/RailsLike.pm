@@ -73,12 +73,12 @@ sub _build_content {
         $content = $self->_parse_manifest( $real_path, $manifest, $type );
 
         if ( $self->minify ) {
-            my $minifier
-                = $type eq 'js'
-                ? 'JavaScript::Minifier::XS::minify'
-                : 'CSS::Minifier::XS::minify';
-            no strict 'refs';
-            $content = $minifier->($content);
+            if ( $type eq 'js' ) {
+                $content = JavaScript::Minifier::XS::minify($content);
+            }
+            else {
+                $content = CSS::Minifier::XS::minify($content);
+            }
         }
 
         $self->cache->set( $real_path, $content );
