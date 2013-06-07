@@ -1,6 +1,8 @@
 Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
+
+0.03 2013-06-07T09:46:47Z
     - Uses prepare_app method to set default values.
     - Adds Cache-Control header to the HTTP response.
     - Removes no strict 'refs'.

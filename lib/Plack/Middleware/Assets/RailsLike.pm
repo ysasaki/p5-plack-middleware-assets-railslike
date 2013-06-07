@@ -16,7 +16,7 @@ use File::Spec::Functions qw(catdir catfile canonpath);
 use HTTP::Date               ();
 use JavaScript::Minifier::XS ();
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 our $EXPIRES_NEVER = $Cache::Cache::EXPIRES_NEVER;
 our $EXPIRES_NOW   = $Cache::Cache::EXPIRES_NOW;
