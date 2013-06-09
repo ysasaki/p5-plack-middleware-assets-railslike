@@ -1,6 +1,8 @@
 Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
+
+0.05 2013-06-09T14:12:23Z
     - Sets cache's auto purge option true.
 
 0.04 2013-06-09T10:13:26Z
