@@ -21,10 +21,7 @@ test_psgi(
         my $cb  = shift;
         my $res = $cb->( GET '/assets/search_path.js' );
         is $res->code,    200;
-        is $res->content, <<CONTENT;
-var foo = 1;
-"load from ya-assets";
-CONTENT
+        is $res->content, "var foo = 1;\n\"load from ya-assets\";";
     }
 );
 

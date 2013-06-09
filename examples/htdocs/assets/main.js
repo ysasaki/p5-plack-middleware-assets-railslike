@@ -1,2 +1,2 @@
-requires 'foo';
-requires 'bar';
+//= require foo
+//= require bar

@@ -24,12 +24,12 @@ __THIS MODULE IS STILL ALPHA. DO NOT USE THIS MODULE IN PRODUCTION.__
 Plack::Middleware::Assets::RailsLike is a Plack middleware to bundle and minify 
 javascript and css files like Ruby on Rails Assets Pipeline.
 
-At first, you create a manifest file. The Manifest file is a list of javascript and css files you want to bundle.
+At first, you create a manifest file. The Manifest file is a list of javascript and css files you want to bundle. The Manifest syntax is same as Rails Assets Pipeline, but only support `require` command.
 
     > vim ./htdocs/assets/main-page.js
     > cat ./htdocs/assets/main-page.js
-    requires 'jquery';
-    requires 'myapp';
+    //= require jquery
+    //= require myapp
 
 
 
