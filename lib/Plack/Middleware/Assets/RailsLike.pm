@@ -41,15 +41,18 @@ sub prepare_app {
     $self->{expires}     ||= '3 days';
     $self->{cache}       ||= Cache::MemoryCache->new(
         {
-            namespace          => __PACKAGE__,
-            default_expires_in => $self->{expires},
+            namespace           => __PACKAGE__,
+            default_expires_in  => $self->{expires},
+            auto_purge_interval => '1 day',
+            auto_purge_on_set   => 1,
+            auto_purge_on_get   => 1
         }
     );
     $self->{minify} //= 1;
 
     $self->{_compiler} = Plack::Middleware::Assets::RailsLike::Compiler->new(
         minify      => $self->{minify},
-        search_path => $self->{search_path}
+        search_path => $self->{search_path},
     );
 }
 
@@ -299,8 +302,11 @@ Cache bundled/minified data in memory. The C<cache> object must be implemented C
 Default is a C<Cache::MemoryCache> Object.
 
     Cache::MemoryCache->new({
-        namespace          => "Plack::Middleware::Assets::RailsLike",
-        default_expires_in => $expires
+        namespace           => "Plack::Middleware::Assets::RailsLike",
+        default_expires_in  => $expires
+        auto_purge_interval => '1 day',
+        auto_purge_on_set   => 1,
+        auto_purge_on_get   => 1
     })
 
 =item expires

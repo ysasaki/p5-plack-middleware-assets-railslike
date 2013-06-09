@@ -73,8 +73,11 @@ If manifest files were requested, bundle files in manifest file and serve it or 
     Default is a `Cache::MemoryCache` Object.
 
         Cache::MemoryCache->new({
-            namespace          => "Plack::Middleware::Assets::RailsLike",
-            default_expires_in => $expires
+            namespace           => "Plack::Middleware::Assets::RailsLike",
+            default_expires_in  => $expires
+            auto_purge_interval => '1 day',
+            auto_purge_on_set   => 1,
+            auto_purge_on_get   => 1
         })
 
 - expires
