@@ -3,12 +3,13 @@ package Plack::Middleware::Assets::RailsLike::Compiler;
 use strict;
 use warnings;
 use Carp              ();
+use CSS::LESSp        ();
 use CSS::Minifier::XS ();
 use Errno             ();
 use File::Slurp;
 use File::Spec::Functions qw(catdir catfile canonpath);
 use JavaScript::Minifier::XS ();
-use Test::More;
+use Text::Sass;
 
 sub new {
     my $class = shift;
@@ -64,24 +65,39 @@ sub _cmd_require {
     my ( $file, $type ) = @_;
 
     my @search_path = @{ $self->{search_path} };
+    my @type = $type eq 'js' ? qw(js) : qw(css scss sass less);
 
     for my $path (@search_path) {
+        for my $type (@type) {
+            my $filename = canonpath(
+                catfile( $path, sprintf( '%s.%s', $file, $type ) ) );
 
-        my $filename
-            = canonpath( catfile( $path, sprintf( '%s.%s', $file, $type ) ) );
+            my $buff;
+            read_file( $filename, buf_ref => \$buff, err_mode => sub { } );
+            unless ($!) {
 
-        my $buff;
-        read_file( $filename, buf_ref => \$buff, err_mode => sub { } );
-        unless ($!) {
-            chomp $buff;
-            return $buff;
-        }
-        elsif ( $!{ENOENT} ) {
-            next;
-        }
-        else {
-            Carp::carp("read_file '$filename' failed - $!");
-            return;
+                my $content;
+                if ( $type eq 'scss' or $type eq 'sass' ) {
+                    my $method = $type . "2css";
+                    $content = Text::Sass->new->$method($buff);
+                }
+                elsif ( $type eq 'less' ) {
+                    $content = join '', CSS::LESSp->parse($buff);
+                }
+                else {
+                    $content = $buff;
+                }
+
+                chomp $content;
+                return $content;
+            }
+            elsif ( $!{ENOENT} ) {
+                next;
+            }
+            else {
+                Carp::carp("read_file '$filename' failed - $!");
+                return;
+            }
         }
     }
 

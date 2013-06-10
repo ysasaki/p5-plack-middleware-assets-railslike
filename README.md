@@ -24,7 +24,7 @@ __THIS MODULE IS STILL ALPHA. DO NOT USE THIS MODULE IN PRODUCTION.__
 Plack::Middleware::Assets::RailsLike is a Plack middleware to bundle and minify 
 javascript and css files like Ruby on Rails Assets Pipeline.
 
-At first, you create a manifest file. The Manifest file is a list of javascript and css files you want to bundle. The Manifest syntax is same as Rails Assets Pipeline, but only support `require` command.
+At first, you create a manifest file. The Manifest file is a list of javascript and css files you want to bundle. You can also use Sass and LESS as css files. The Manifest syntax is same as Rails Assets Pipeline, but only support `require` command.
 
     > vim ./htdocs/assets/main-page.js
     > cat ./htdocs/assets/main-page.js
@@ -88,7 +88,7 @@ If manifest files were requested, bundle files in manifest file and serve it or 
 
 # DEPENDENCIES
 
-[Plack](http://search.cpan.org/perldoc?Plack), [Cache::Cache](http://search.cpan.org/perldoc?Cache::Cache), [File::Slurp](http://search.cpan.org/perldoc?File::Slurp), [JavaScript::Minifier::XS](http://search.cpan.org/perldoc?JavaScript::Minifier::XS), [CSS::Minifier::XS](http://search.cpan.org/perldoc?CSS::Minifier::XS), [Digest::SHA1](http://search.cpan.org/perldoc?Digest::SHA1), [HTTP::Date](http://search.cpan.org/perldoc?HTTP::Date)
+[Plack](http://search.cpan.org/perldoc?Plack), [Cache::Cache](http://search.cpan.org/perldoc?Cache::Cache), [File::Slurp](http://search.cpan.org/perldoc?File::Slurp), [JavaScript::Minifier::XS](http://search.cpan.org/perldoc?JavaScript::Minifier::XS), [CSS::Minifier::XS](http://search.cpan.org/perldoc?CSS::Minifier::XS), [Digest::SHA1](http://search.cpan.org/perldoc?Digest::SHA1), [HTTP::Date](http://search.cpan.org/perldoc?HTTP::Date), [Text::Sass](http://search.cpan.org/perldoc?Text::Sass), [CSS::LESSp](http://search.cpan.org/perldoc?CSS::LESSp)
 
 # LICENSE
 

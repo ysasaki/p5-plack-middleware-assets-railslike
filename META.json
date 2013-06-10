@@ -4,7 +4,7 @@
       "Yoshihiro Sasaki"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.4.9, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Minilla/v0.5.0, CPAN::Meta::Converter version 2.131560",
    "license" : [
       "perl_5"
    ],
@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "CSS::LESSp" : "0.86",
             "CSS::Minifier::XS" : "0.08",
             "Cache::Cache" : "1.06",
             "Digest::SHA1" : "2.13",
@@ -49,6 +50,7 @@
             "HTTP::Date" : "6.02",
             "JavaScript::Minifier::XS" : "0.09",
             "Plack" : "0",
+            "Text::Sass" : "0.97",
             "perl" : "5.010001"
          }
       },

@@ -1,6 +1,7 @@
 Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
+    - Supports Sass and LESS files.
 
 0.05 2013-06-09T14:12:23Z
     - Sets cache's auto purge option true.
