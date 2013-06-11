@@ -239,20 +239,21 @@ Plack::Middleware::Assets::RailsLike - Bundle and minify JavaScript and CSS file
     use Plack::Builder;
 
     my $app = MyApp->new->to_app;
-    
     builder {
         enable 'Assets::RailsLike', root => './htdocs';
         $app;
     };
 
+=head1 WARNING
+
+B<This module is under development and considered ALPHA quality.>
+
 =head1 DESCRIPTION
 
-B<THIS MODULE IS STILL ALPHA. DO NOT USE THIS MODULE IN PRODUCTION.>
+Plack::Middleware::Assets::RailsLike is a middleware to bundle and minify 
+JavaScript and CSS (included Sass and LESS) files like Ruby on Rails Asset Pipeline.
 
-Plack::Middleware::Assets::RailsLike is a Plack middleware to bundle and minify 
-javascript and css files like Ruby on Rails Assets Pipeline.
-
-At first, you create a manifest file. The Manifest file is a list of javascript and css files you want to bundle. You can also use Sass and LESS as css files. The Manifest syntax is same as Rails Assets Pipeline, but only support C<require> command.
+At first, you create a manifest file. The Manifest file is a list of JavaScript and CSS files you want to bundle. You can also use Sass and LESS as css files. The Manifest syntax is same as Rails Asset Pipeline, but only support C<require> command.
 
     > vim ./htdocs/assets/main-page.js
     > cat ./htdocs/assets/main-page.js
@@ -260,12 +261,12 @@ At first, you create a manifest file. The Manifest file is a list of javascript 
     //= require myapp
 
 
-Next, write a manifest file's url in your html. This middleware supports versioning. So you can add version string like this.
+Next, write URLs of manifest file to your html. This middleware supports versioning. So you can add version string in between its file basename and suffix.
 
-    <- $basename-$version$suffix ->
+    <- $basename-$version.$suffix ->
     <script type="text/javascript" src="/assets/main-page-v2013060701.js">
 
-If manifest files were requested, bundle files in manifest file and serve it or serve bundled data from cache. In this case, find I<jquery.js>, I<myapp.js> from search path (default search path is C<$root>/assets).
+If manifest files were requested, bundle files in manifest file and serve it or serve bundled data from cache. In this case, find jquery.js and myapp.js from search path (default search path is C<$root>/assets). This middleware return HTTP response with C<Cache-Control>, C<Expires> and C<Etag>. C<Cache-Control> and C<Expires> are computed from the C<expires> option. C<Etag> is computed from bundled content.
 
 =head1 CONFIGURATIONS
 
@@ -297,9 +298,9 @@ Default value is C<1>.
 
 =item cache
 
-Cache bundled/minified data in memory. The C<cache> object must be implemented C<get> and C<set> methods.
+Store concatenated data in memory by default using L<Cache::MemoryCache>. The C<cache> option must be a object implemented C<get> and C<set> methods. For example, L<Cache::Memcached::Fast>.
 
-Default is a C<Cache::MemoryCache> Object.
+Default is a L<Cache::MemoryCache> Object.
 
     Cache::MemoryCache->new({
         namespace           => "Plack::Middleware::Assets::RailsLike",
@@ -311,15 +312,63 @@ Default is a C<Cache::MemoryCache> Object.
 
 =item expires
 
-Expiration of cache and Expires header in HTTP response. See L<Cache::Cache> for more details.
+Expiration of the cache and Cache-Control, Expires headers in HTTP response. The format of This option is same as default_expires_in option of L<Cache::Cache>. See L<Cache::Cache> for more details.
 
-Default is 3 days.
+Default is C<'3 days'>.
 
 =back
 
+=head1 MOTIVATION
+
+I want a middleware has futures below.
+
+    1. Concat JavaScript and CSS
+    2. Minify contents
+    3. Cache a compiled data
+    4. Version string in filename
+    5. Support Sass and LESS files
+    6. Less configuration
+    7. Pre-compile (Not implemented yet...)
+
+L<Plack::Middleware::StaticShared> is good choice for me. But it needs to write definitions for each resource types. And its URL format is a bit strange.
+
+=head1 SEE ALSO
+
+L<Plack::Middleware::StaticShared>
+
+L<Plack::Middleware::Assets>
+
+L<Plack::App::MCCS>
+
+L<Plack::Middleware::Static::Combine>
+
+L<Plack::Middleware::Static::Minifier>
+
+L<Plack::Middleware::Compile>
+
+L<Plack::Middleware::JSConcat>
+
+L<Catalyst::Plugin::Assets>
+
 =head1 DEPENDENCIES
 
-L<Plack>, L<Cache::Cache>, L<File::Slurp>, L<JavaScript::Minifier::XS>, L<CSS::Minifier::XS>, L<Digest::SHA1>, L<HTTP::Date>, L<Text::Sass>, L<CSS::LESSp>
+L<Plack>
+
+L<Cache::Cache>
+
+L<File::Slurp>
+
+L<JavaScript::Minifier::XS>
+
+L<CSS::Minifier::XS>
+
+L<Digest::SHA1>
+
+L<HTTP::Date>
+
+L<Text::Sass>
+
+L<CSS::LESSp>
 
 =head1 LICENSE
 
@@ -333,4 +382,3 @@ it under the same terms as Perl itself.
 Yoshihiro Sasaki E<lt>ysasaki@cpan.orgE<gt>
 
 =cut
-
