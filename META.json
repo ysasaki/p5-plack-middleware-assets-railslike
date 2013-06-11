@@ -4,7 +4,7 @@
       "Yoshihiro Sasaki"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.5.0, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Minilla/v0.5.2, CPAN::Meta::Converter version 2.131560",
    "license" : [
       "perl_5"
    ],
@@ -74,7 +74,7 @@
          "web" : "https://github.com/ysasaki/p5-plack-middleware-assets-railslike"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "ysasaki <aloelight@gmail.com>"
    ]

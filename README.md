@@ -33,7 +33,7 @@ At first, you create a manifest file. The Manifest file is a list of JavaScript 
 
 
 
-Next, write urls of manfest file to your html. This middleware supports versioning. So you can add version string in between its file basename and suffix.
+Next, write URLs of manifest file to your html. This middleware supports versioning. So you can add version string in between its file basename and suffix.
 
     <- $basename-$version.$suffix ->
     <script type="text/javascript" src="/assets/main-page-v2013060701.js">
