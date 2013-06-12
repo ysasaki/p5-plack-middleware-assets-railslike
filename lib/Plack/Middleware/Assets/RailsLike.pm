@@ -161,8 +161,6 @@ sub _build_response {
     ];
 }
 
-my $file_id = 0;
-
 sub _max_age {
     my $self    = shift;
     my $max_age = 0;
