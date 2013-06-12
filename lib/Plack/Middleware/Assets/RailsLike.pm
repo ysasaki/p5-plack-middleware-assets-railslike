@@ -136,7 +136,7 @@ sub _build_content {
         }
 
         # filename with versioning as a key
-        $self->cache->set( $real_path, $content );
+        $self->cache->set( $real_path, $content, $self->{_max_age} );
         last;
     }
     return $content;

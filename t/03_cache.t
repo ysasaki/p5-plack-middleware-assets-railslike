@@ -9,12 +9,34 @@ use Plack::Builder;
 use HTTP::Request::Common;
 use Cache::MemoryCache;
 
-my $cache = Cache::MemoryCache->new( { namespace => 'foo' } );
+{
+    package MyCache;
+
+    sub new {
+        my $class = shift;
+        bless {}, $class;
+    }
+
+    sub get {
+        my $self = shift;
+        my ($key) = @_;
+        return $self->{$key};
+    }
+
+    sub set {
+        my $self = shift;
+        my ($key, $content, $expires) = @_;
+        $self->{$key} = [$content, $expires];
+    }
+}
+
+my $cache = MyCache->new;
 my $app = builder {
     enable 'Assets::RailsLike',
-        cache  => $cache,
-        root   => './t',
-        minify => 0;
+        cache   => $cache,
+        root    => './t',
+        expires => 12345,
+        minify  => 0;
     sub { [ 200, [ 'Content-Type', 'text/html' ], ['OK'] ] };
 };
 
@@ -47,7 +69,8 @@ sub cache_ok {
     my ( $name, $key, $expected ) = @_;
     subtest $name => sub {
         my $cached = $cache->get($key);
-        is $cached, $expected;
+        is $cached->[0], $expected;
+        is $cached->[1], 12345;
     };
 }
 
