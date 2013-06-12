@@ -54,6 +54,8 @@ sub prepare_app {
         minify      => $self->{minify},
         search_path => $self->{search_path},
     );
+
+    $self->{_max_age} = $self->_max_age;
 }
 
 sub call {
@@ -146,7 +148,7 @@ sub _build_response {
 
     # build headers
     my $content_type = $type eq 'js' ? 'application/javascript' : 'text/css';
-    my $max_age      = $self->_max_age;
+    my $max_age      = $self->{_max_age};
     my $expires      = time + $max_age;
 
     return [
