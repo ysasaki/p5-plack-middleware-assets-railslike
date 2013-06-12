@@ -91,7 +91,7 @@ sub _cmd_require {
                 chomp $content;
                 return $content;
             }
-            elsif ( $!{ENOENT} ) {
+            elsif ( $! == Errno::ENOENT ) {
                 next;
             }
             else {

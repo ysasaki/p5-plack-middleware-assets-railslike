@@ -115,7 +115,7 @@ sub _build_content {
     for my $file (@list) {
         my $manifest;
         read_file( $file, buf_ref => \$manifest, err_mode => sub { } );
-        if ( $! and $!{ENOENT} ) {
+        if ( $! && $! == Errno::ENOENT ) {
             $pre_compiled = 0;
             next;
         }
