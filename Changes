@@ -1,6 +1,8 @@
 Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
+
+0.08 2013-06-12T09:45:13Z
     - Removes an unused variable.
     - Uses Errno::ENOENT instead of %! for speed.
     - Creates max_age in constructor.
