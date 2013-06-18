@@ -7,6 +7,7 @@ requires 'File::Slurp',              '9999.19';
 requires 'HTTP::Date',               '6.02';
 requires 'JavaScript::Minifier::XS', '0.09';
 requires 'Plack';
+requires 'Text::Sass',               '0.97';
 requires 'Text::Sass::XS',           '0.06';
 
 on 'test' => sub {
