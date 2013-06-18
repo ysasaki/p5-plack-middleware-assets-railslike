@@ -23,13 +23,7 @@ my $c = new_ok 'Plack::Middleware::Assets::RailsLike::Compiler',
 
 subtest 'scss' => sub {
 
-    my $oneline = <<EOM;
-.foo {
-  border-color: #3bbfce;
-  color: #2ba1af;
-}
-EOM
-    chomp $oneline;
+    my $oneline = '.foo{border-color:#3bbfce;color:#2ca2af;}';
     compile_ok( $c, '03_scss.css', $oneline, 'scss' );
 };
 

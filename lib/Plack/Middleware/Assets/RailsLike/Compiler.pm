@@ -9,7 +9,7 @@ use Errno             ();
 use File::Slurp;
 use File::Spec::Functions qw(catdir catfile canonpath);
 use JavaScript::Minifier::XS ();
-use Text::Sass;
+use Text::Sass::XS qw(:const);
 
 sub new {
     my $class = shift;
@@ -18,7 +18,16 @@ sub new {
         search_path => ['.'],
         @_
     );
-    bless \%args, $class;
+    my $self = bless \%args, $class;
+
+    $self->{sass_compiler} = Text::Sass::XS->new(
+        output_style    => SASS_STYLE_COMPRESSED,
+        source_comments => SASS_SOURCE_COMMENTS_NONE,
+        include_paths   => $self->{search_path},
+        image_path      => undef, # TBD require option?
+    );
+
+    return $self;
 }
 
 sub compile {
@@ -77,9 +86,11 @@ sub _cmd_require {
             unless ($!) {
 
                 my $content;
-                if ( $type eq 'scss' or $type eq 'sass' ) {
-                    my $method = $type . "2css";
-                    $content = Text::Sass->new->$method($buff);
+                if ( $type eq 'scss' ) {
+                    $content = $self->{sass_compiler}->scss2css($buff);
+                }
+                elsif ( $type eq 'sass' ) {
+                    $content = $self->{sass_compiler}->sass2css($buff);
                 }
                 elsif ( $type eq 'less' ) {
                     $content = join '', CSS::LESSp->parse($buff);
