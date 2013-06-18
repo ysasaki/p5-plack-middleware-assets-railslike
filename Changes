@@ -1,6 +1,7 @@
 Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
+    - Uses Text::Sass::XS.
 
 0.08 2013-06-12T09:45:13Z
     - Removes an unused variable.
