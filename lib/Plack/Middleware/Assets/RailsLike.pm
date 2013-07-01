@@ -4,6 +4,7 @@ use 5.010_001;
 use strict;
 use warnings;
 use parent 'Plack::Middleware';
+use Cache::NullCache;
 use Cache::MemoryCache;
 use Carp         ();
 use Digest::SHA1 ();
@@ -39,23 +40,35 @@ sub prepare_app {
     $self->{root}        ||= '.';
     $self->{search_path} ||= [ catdir( $self->{root}, 'assets' ) ];
     $self->{expires}     ||= '3 days';
-    $self->{cache}       ||= Cache::MemoryCache->new(
-        {
-            namespace           => __PACKAGE__,
-            default_expires_in  => $self->{expires},
-            auto_purge_interval => '1 day',
-            auto_purge_on_set   => 1,
-            auto_purge_on_get   => 1
-        }
-    );
+
+    if ( $self->{cache} ) {
+        $self->{_max_age} = $self->_max_age;
+    }
+    elsif ( $ENV{PLACK_ENV} and $ENV{PLACK_ENV} eq 'development' ) {
+
+        # disable cache
+        $self->{cache}    = Cache::NullCache->new;
+        $self->{_max_age} = 0;
+    }
+    else {
+        $self->{cache} = Cache::MemoryCache->new(
+            {
+                namespace           => __PACKAGE__,
+                default_expires_in  => $self->{expires},
+                auto_purge_interval => '1 day',
+                auto_purge_on_set   => 1,
+                auto_purge_on_get   => 1
+            }
+        );
+        $self->{_max_age} = $self->_max_age;
+    }
+
     $self->{minify} //= 1;
 
     $self->{_compiler} = Plack::Middleware::Assets::RailsLike::Compiler->new(
         minify      => $self->{minify},
         search_path => $self->{search_path},
     );
-
-    $self->{_max_age} = $self->_max_age;
 }
 
 sub call {
@@ -136,7 +149,8 @@ sub _build_content {
         }
 
         # filename with versioning as a key
-        $self->cache->set( $real_path, $content, $self->{_max_age} );
+        $self->cache->set( $real_path, $content, $self->{_max_age} )
+          if $self->{_max_age} > 0;
         last;
     }
     return $content;
@@ -151,29 +165,45 @@ sub _build_response {
     my $max_age      = $self->{_max_age};
     my $expires      = time + $max_age;
 
-    return [
-        200,
-        [   'Content-Type'   => $content_type,
-            'Content-Length' => length($content),
-            'Cache-Control'  => sprintf( 'max-age=%d', $max_age ),
-            'Expires'        => HTTP::Date::time2str($expires),
-            'Etag'           => $etag,
-        ],
-        [$content]
-    ];
+    if ( $max_age > 0 ) {
+        return [
+            200,
+            [
+                'Content-Type'   => $content_type,
+                'Content-Length' => length($content),
+                'Cache-Control'  => sprintf( 'max-age=%d', $max_age ),
+                'Expires'        => HTTP::Date::time2str($expires),
+                'Etag'           => $etag,
+            ],
+            [$content]
+        ];
+    }
+    else {
+        return [
+            200,
+            [
+                'Content-Type'   => $content_type,
+                'Content-Length' => length($content),
+                'Cache-Control'  => 'no-store',
+            ],
+            [$content]
+        ];
+    }
 }
 
 sub _max_age {
     my $self    = shift;
     my $max_age = 0;
-    if ( $self->expires ne $EXPIRES_NEVER and $self->expires ne $EXPIRES_NOW )
-    {
-        $max_age = $self->_expires_in_seconds;
-    }
-    elsif ( $self->expires eq $EXPIRES_NEVER ) {
+    if ( $self->expires eq $EXPIRES_NEVER ) {
 
         # See http://www.w3.org/Protocols/rfc2616/rfc2616.txt 14.21 Expires
         $max_age = $_expiration_units{'year'};
+    }
+    elsif ( $self->expires eq $EXPIRES_NOW ) {
+        $max_age = 0;
+    }
+    else {
+        $max_age = $self->_expires_in_seconds;
     }
     return $max_age;
 }
@@ -298,7 +328,7 @@ Default value is C<1>.
 
 =item cache
 
-Store concatenated data in memory by default using L<Cache::MemoryCache>. The C<cache> option must be a object implemented C<get> and C<set> methods. For example, L<Cache::Memcached::Fast>.
+Store concatenated data in memory by default using L<Cache::MemoryCache>. The C<cache> option must be a object implemented C<get> and C<set> methods. For example, L<Cache::Memcached::Fast>. If C<$ENV{PLACK_ENV} eq "development"> and you didn't pass a cache object, cache is disabled.
 
 Default is a L<Cache::MemoryCache> Object.
 

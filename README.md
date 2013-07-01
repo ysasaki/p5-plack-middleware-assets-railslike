@@ -68,7 +68,7 @@ If manifest files were requested, bundle files in manifest file and serve it or 
 
 - cache
 
-    Store concatenated data in memory by default using [Cache::MemoryCache](http://search.cpan.org/perldoc?Cache::MemoryCache). The `cache` option must be a object implemented `get` and `set` methods. For example, [Cache::Memcached::Fast](http://search.cpan.org/perldoc?Cache::Memcached::Fast).
+    Store concatenated data in memory by default using [Cache::MemoryCache](http://search.cpan.org/perldoc?Cache::MemoryCache). The `cache` option must be a object implemented `get` and `set` methods. For example, [Cache::Memcached::Fast](http://search.cpan.org/perldoc?Cache::Memcached::Fast). If `$ENV{PLACK_ENV} eq "development"` and you didn't pass a cache object, cache is disabled.
 
     Default is a [Cache::MemoryCache](http://search.cpan.org/perldoc?Cache::MemoryCache) Object.
 

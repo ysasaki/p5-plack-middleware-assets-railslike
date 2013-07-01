@@ -2,6 +2,7 @@ Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
     - Uses Text::Sass::XS.
+    - Disables caching if PLACK_ENV equals "development" and didn't pass a cache object.
 
 0.08 2013-06-12T09:45:13Z
     - Removes an unused variable.
