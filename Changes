@@ -1,6 +1,8 @@
 Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
+
+0.10 2013-08-04T14:27:18Z
     - Adds a precompiler script.
     - Formats POD.
 
