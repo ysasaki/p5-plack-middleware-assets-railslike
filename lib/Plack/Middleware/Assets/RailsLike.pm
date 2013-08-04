@@ -280,10 +280,14 @@ B<This module is under development and considered ALPHA quality.>
 
 =head1 DESCRIPTION
 
-Plack::Middleware::Assets::RailsLike is a middleware to bundle and minify 
-JavaScript and CSS (included Sass and LESS) files like Ruby on Rails Asset Pipeline.
+Plack::Middleware::Assets::RailsLike is a middleware to bundle and minify
+JavaScript and CSS (included Sass and LESS) files like Ruby on Rails Asset
+Pipeline.
 
-At first, you create a manifest file. The Manifest file is a list of JavaScript and CSS files you want to bundle. You can also use Sass and LESS as css files. The Manifest syntax is same as Rails Asset Pipeline, but only support C<require> command.
+At first, you create a manifest file. The Manifest file is a list of JavaScript
+and CSS files you want to bundle. You can also use Sass and LESS as css files.
+The Manifest syntax is same as Rails Asset Pipeline, but only support
+C<require> command.
 
     > vim ./htdocs/assets/main-page.js
     > cat ./htdocs/assets/main-page.js
@@ -291,12 +295,19 @@ At first, you create a manifest file. The Manifest file is a list of JavaScript 
     //= require myapp
 
 
-Next, write URLs of manifest file to your html. This middleware supports versioning. So you can add version string in between its file basename and suffix.
+Next, write URLs of manifest file to your html. This middleware supports
+versioning. So you can add version string in between its file basename and
+suffix.
 
     <- $basename-$version.$suffix ->
     <script type="text/javascript" src="/assets/main-page-v2013060701.js">
 
-If manifest files were requested, bundle files in manifest file and serve it or serve bundled data from cache. In this case, find jquery.js and myapp.js from search path (default search path is C<$root>/assets). This middleware return HTTP response with C<Cache-Control>, C<Expires> and C<Etag>. C<Cache-Control> and C<Expires> are computed from the C<expires> option. C<Etag> is computed from bundled content.
+If manifest files were requested, bundle files in manifest file and serve it or
+serve bundled data from cache. In this case, find jquery.js and myapp.js from
+search path (default search path is C<$root>/assets). This middleware return
+HTTP response with C<Cache-Control>, C<Expires> and C<Etag>. C<Cache-Control>
+and C<Expires> are computed from the C<expires> option. C<Etag> is computed
+from bundled content.
 
 =head1 CONFIGURATIONS
 
@@ -328,7 +339,10 @@ Default value is C<1>.
 
 =item cache
 
-Store concatenated data in memory by default using L<Cache::MemoryCache>. The C<cache> option must be a object implemented C<get> and C<set> methods. For example, L<Cache::Memcached::Fast>. If C<$ENV{PLACK_ENV} eq "development"> and you didn't pass a cache object, cache is disabled.
+Store concatenated data in memory by default using L<Cache::MemoryCache>. The
+C<cache> option must be a object implemented C<get> and C<set> methods. For
+example, L<Cache::Memcached::Fast>. If C<$ENV{PLACK_ENV} eq "development"> and
+you didn't pass a cache object, cache is disabled.
 
 Default is a L<Cache::MemoryCache> Object.
 
@@ -342,11 +356,19 @@ Default is a L<Cache::MemoryCache> Object.
 
 =item expires
 
-Expiration of the cache and Cache-Control, Expires headers in HTTP response. The format of This option is same as default_expires_in option of L<Cache::Cache>. See L<Cache::Cache> for more details.
+Expiration of the cache and Cache-Control, Expires headers in HTTP response.
+The format of This option is same as default_expires_in option of
+L<Cache::Cache>. See L<Cache::Cache> for more details.
 
 Default is C<'3 days'>.
 
 =back
+
+=head1 PRECOMPILE
+
+This distribution includes L<assets-railslike-precompiler.pl>. This script can
+pre-compile manifest files. See perldoc L<assets-railslike-precompiler.pl> for
+more details.
 
 =head1 MOTIVATION
 
@@ -358,9 +380,10 @@ I want a middleware has futures below.
     4. Version string in filename
     5. Support Sass and LESS files
     6. Less configuration
-    7. Pre-compile (Not implemented yet...)
+    7. Pre-compile
 
-L<Plack::Middleware::StaticShared> is good choice for me. But it needs to write definitions for each resource types. And its URL format is a bit strange.
+L<Plack::Middleware::StaticShared> is good choice for me. But it needs to write
+definitions for each resource types. And its URL format is a bit strange.
 
 =head1 SEE ALSO
 

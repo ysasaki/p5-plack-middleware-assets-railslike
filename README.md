@@ -21,10 +21,14 @@ __This module is under development and considered ALPHA quality.__
 
 # DESCRIPTION
 
-Plack::Middleware::Assets::RailsLike is a middleware to bundle and minify 
-JavaScript and CSS (included Sass and LESS) files like Ruby on Rails Asset Pipeline.
+Plack::Middleware::Assets::RailsLike is a middleware to bundle and minify
+JavaScript and CSS (included Sass and LESS) files like Ruby on Rails Asset
+Pipeline.
 
-At first, you create a manifest file. The Manifest file is a list of JavaScript and CSS files you want to bundle. You can also use Sass and LESS as css files. The Manifest syntax is same as Rails Asset Pipeline, but only support `require` command.
+At first, you create a manifest file. The Manifest file is a list of JavaScript
+and CSS files you want to bundle. You can also use Sass and LESS as css files.
+The Manifest syntax is same as Rails Asset Pipeline, but only support
+`require` command.
 
     > vim ./htdocs/assets/main-page.js
     > cat ./htdocs/assets/main-page.js
@@ -33,12 +37,19 @@ At first, you create a manifest file. The Manifest file is a list of JavaScript 
 
 
 
-Next, write URLs of manifest file to your html. This middleware supports versioning. So you can add version string in between its file basename and suffix.
+Next, write URLs of manifest file to your html. This middleware supports
+versioning. So you can add version string in between its file basename and
+suffix.
 
     <- $basename-$version.$suffix ->
     <script type="text/javascript" src="/assets/main-page-v2013060701.js">
 
-If manifest files were requested, bundle files in manifest file and serve it or serve bundled data from cache. In this case, find jquery.js and myapp.js from search path (default search path is `$root`/assets). This middleware return HTTP response with `Cache-Control`, `Expires` and `Etag`. `Cache-Control` and `Expires` are computed from the `expires` option. `Etag` is computed from bundled content.
+If manifest files were requested, bundle files in manifest file and serve it or
+serve bundled data from cache. In this case, find jquery.js and myapp.js from
+search path (default search path is `$root`/assets). This middleware return
+HTTP response with `Cache-Control`, `Expires` and `Etag`. `Cache-Control`
+and `Expires` are computed from the `expires` option. `Etag` is computed
+from bundled content.
 
 # CONFIGURATIONS
 
@@ -68,7 +79,10 @@ If manifest files were requested, bundle files in manifest file and serve it or 
 
 - cache
 
-    Store concatenated data in memory by default using [Cache::MemoryCache](http://search.cpan.org/perldoc?Cache::MemoryCache). The `cache` option must be a object implemented `get` and `set` methods. For example, [Cache::Memcached::Fast](http://search.cpan.org/perldoc?Cache::Memcached::Fast). If `$ENV{PLACK_ENV} eq "development"` and you didn't pass a cache object, cache is disabled.
+    Store concatenated data in memory by default using [Cache::MemoryCache](http://search.cpan.org/perldoc?Cache::MemoryCache). The
+    `cache` option must be a object implemented `get` and `set` methods. For
+    example, [Cache::Memcached::Fast](http://search.cpan.org/perldoc?Cache::Memcached::Fast). If `$ENV{PLACK_ENV} eq "development"` and
+    you didn't pass a cache object, cache is disabled.
 
     Default is a [Cache::MemoryCache](http://search.cpan.org/perldoc?Cache::MemoryCache) Object.
 
@@ -82,9 +96,17 @@ If manifest files were requested, bundle files in manifest file and serve it or 
 
 - expires
 
-    Expiration of the cache and Cache-Control, Expires headers in HTTP response. The format of This option is same as default\_expires\_in option of [Cache::Cache](http://search.cpan.org/perldoc?Cache::Cache). See [Cache::Cache](http://search.cpan.org/perldoc?Cache::Cache) for more details.
+    Expiration of the cache and Cache-Control, Expires headers in HTTP response.
+    The format of This option is same as default\_expires\_in option of
+    [Cache::Cache](http://search.cpan.org/perldoc?Cache::Cache). See [Cache::Cache](http://search.cpan.org/perldoc?Cache::Cache) for more details.
 
     Default is `'3 days'`.
+
+# PRECOMPILE
+
+This distribution includes [assets-railslike-precompiler.pl](http://search.cpan.org/perldoc?assets-railslike-precompiler.pl). This script can
+pre-compile manifest files. See perldoc [assets-railslike-precompiler.pl](http://search.cpan.org/perldoc?assets-railslike-precompiler.pl) for
+more details.
 
 # MOTIVATION
 
@@ -96,9 +118,10 @@ I want a middleware has futures below.
     4. Version string in filename
     5. Support Sass and LESS files
     6. Less configuration
-    7. Pre-compile (Not implemented yet...)
+    7. Pre-compile
 
-[Plack::Middleware::StaticShared](http://search.cpan.org/perldoc?Plack::Middleware::StaticShared) is good choice for me. But it needs to write definitions for each resource types. And its URL format is a bit strange.
+[Plack::Middleware::StaticShared](http://search.cpan.org/perldoc?Plack::Middleware::StaticShared) is good choice for me. But it needs to write
+definitions for each resource types. And its URL format is a bit strange.
 
 # SEE ALSO
 
