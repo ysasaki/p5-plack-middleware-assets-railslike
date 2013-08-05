@@ -1,6 +1,8 @@
 Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
+
+0.11 2013-08-05T02:10:28Z
     - Adds shebang to ./bin/assets-railslike-precompiler.pl.
 
 0.10 2013-08-04T14:27:18Z
