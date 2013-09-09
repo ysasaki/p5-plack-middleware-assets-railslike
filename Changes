@@ -1,6 +1,8 @@
 Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
+
+0.13 2013-09-09T08:22:21Z
     - Updates Text::Sass::XS@0.10
 
 0.12 2013-09-09T08:09:43Z

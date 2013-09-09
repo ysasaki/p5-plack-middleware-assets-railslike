@@ -75,7 +75,7 @@
          "web" : "https://github.com/ysasaki/p5-plack-middleware-assets-railslike"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_contributors" : [
       "ysasaki <aloelight@gmail.com>"
    ]

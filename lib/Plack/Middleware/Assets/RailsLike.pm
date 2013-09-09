@@ -16,7 +16,7 @@ use HTTP::Date ();
 use Plack::Util::Accessor qw(path root search_path expires cache minify);
 use Plack::Middleware::Assets::RailsLike::Compiler;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 our $EXPIRES_NEVER = $Cache::Cache::EXPIRES_NEVER;
 our $EXPIRES_NOW   = $Cache::Cache::EXPIRES_NOW;
