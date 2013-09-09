@@ -1,6 +1,8 @@
 Revision history for Perl extension Plack-Middleware-Assets-RailsLike
 
 {{$NEXT}}
+
+0.12 2013-09-09T08:09:43Z
     - Updates POD.
 
 0.11 2013-08-05T02:10:28Z
