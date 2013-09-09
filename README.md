@@ -17,7 +17,7 @@ Plack::Middleware::Assets::RailsLike - Bundle and minify JavaScript and CSS file
 
 # WARNING
 
-__This module is under development and considered ALPHA quality.__
+__This module is under development and considered BETA quality.__
 
 # DESCRIPTION
 
@@ -107,6 +107,9 @@ from bundled content.
 This distribution includes [assets-railslike-precompiler.pl](http://search.cpan.org/perldoc?assets-railslike-precompiler.pl). This script can
 pre-compile manifest files. See perldoc [assets-railslike-precompiler.pl](http://search.cpan.org/perldoc?assets-railslike-precompiler.pl) for
 more details.
+
+I strongly recommend using pre-compiled files with
+[Plack::Middleware::Static](http://search.cpan.org/perldoc?Plack::Middleware::Static) in the production environment.
 
 # MOTIVATION
 

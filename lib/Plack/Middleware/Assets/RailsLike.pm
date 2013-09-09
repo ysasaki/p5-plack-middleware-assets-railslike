@@ -276,7 +276,7 @@ Plack::Middleware::Assets::RailsLike - Bundle and minify JavaScript and CSS file
 
 =head1 WARNING
 
-B<This module is under development and considered ALPHA quality.>
+B<This module is under development and considered BETA quality.>
 
 =head1 DESCRIPTION
 
@@ -369,6 +369,9 @@ Default is C<'3 days'>.
 This distribution includes L<assets-railslike-precompiler.pl>. This script can
 pre-compile manifest files. See perldoc L<assets-railslike-precompiler.pl> for
 more details.
+
+I strongly recommend using pre-compiled files with
+L<Plack::Middleware::Static> in the production environment.
 
 =head1 MOTIVATION
 
